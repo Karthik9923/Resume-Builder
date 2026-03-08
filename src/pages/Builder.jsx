@@ -44,6 +44,7 @@ const initialResumeData = {
 
 export default function Builder() {
   const [resumeData, setResumeData] = useState(initialResumeData);
+  const [template, setTemplate] = useState('US'); // 'US', 'UK', 'India'
 
   const handleUpdateInfo = (section, data) => {
     setResumeData(prev => ({
@@ -53,9 +54,17 @@ export default function Builder() {
   };
 
   return (
-    <div className="app-container">
-      <ResumeForm resumeData={resumeData} onUpdate={handleUpdateInfo} />
-      <ResumePreview resumeData={resumeData} />
+    <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900">
+      <ResumeForm
+        resumeData={resumeData}
+        onUpdate={handleUpdateInfo}
+        template={template}
+        setTemplate={setTemplate}
+      />
+      <ResumePreview
+        resumeData={resumeData}
+        template={template}
+      />
     </div>
   );
 }
