@@ -54,7 +54,8 @@ export default function Builder() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-950 text-slate-100 selection:bg-indigo-500/30">
+    <div style={{ display: 'grid', gridTemplateColumns: '500px 1fr', height: '100vh', width: '100%', overflow: 'hidden', background: '#020617' }}>
+
       <ResumeForm
         resumeData={resumeData}
         onUpdate={handleUpdateInfo}

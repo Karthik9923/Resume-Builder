@@ -251,21 +251,26 @@ export default function ResumePreview({ resumeData, template }) {
     );
 
     return (
-        <div className="flex-[2] p-8 flex flex-col items-center overflow-y-auto relative bg-slate-950 border-l border-slate-800 custom-scrollbar">
-            <div className="w-full max-w-[800px] flex justify-between items-center mb-6">
-                <h2 className="text-white font-bold text-xl drop-shadow-sm">Live Preview <span className="text-indigo-400 font-normal">({template} Format)</span></h2>
-                <button
-                    onClick={generatePDF}
-                    className="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:shadow-[0_0_25px_rgba(99,102,241,0.6)] transition-all"
-                >
-                    <Download size={18} /> Download PDF
-                </button>
-            </div>
+        <div
+            className="bg-slate-950 border-l border-slate-800"
+            style={{ height: '100%', overflowY: 'auto', overflowX: 'auto', minWidth: 0 }}
+        >
+            <div className="p-8 flex flex-col items-center">
+                <div className="w-full max-w-[800px] flex justify-between items-center mb-6">
+                    <h2 className="text-white font-bold text-xl drop-shadow-sm">Live Preview <span className="text-indigo-400 font-normal">({template} Format)</span></h2>
+                    <button
+                        onClick={generatePDF}
+                        className="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:shadow-[0_0_25px_rgba(99,102,241,0.6)] transition-all"
+                    >
+                        <Download size={18} /> Download PDF
+                    </button>
+                </div>
 
-            <div className="origin-top flex justify-center pb-8">
-                {template === 'US' && renderUSTemplate()}
-                {template === 'UK' && renderUKTemplate()}
-                {template === 'India' && renderIndiaTemplate()}
+                <div className="origin-top flex justify-center pb-8">
+                    {template === 'US' && renderUSTemplate()}
+                    {template === 'UK' && renderUKTemplate()}
+                    {template === 'India' && renderIndiaTemplate()}
+                </div>
             </div>
         </div>
     );
