@@ -81,7 +81,7 @@ export default function Landing() {
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </button>
                         <button
-                            onClick={() => navigate('/builder')}
+                            onClick={() => navigate('/templates')}
                             className="flex items-center justify-center gap-2 bg-slate-900 border border-slate-700 hover:border-slate-500 hover:bg-slate-800 text-slate-200 px-8 py-3.5 rounded-lg text-lg font-semibold transition-all w-full sm:w-auto shadow-lg"
                         >
                             Explore Templates

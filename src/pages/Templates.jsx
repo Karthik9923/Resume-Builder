@@ -42,6 +42,45 @@ const templates = [
         accent: '#f59e0b',
         preview: <IndiaPreview />,
     },
+    {
+        id: 'Minimalist',
+        name: 'Modern Minimalist',
+        tag: 'Designer',
+        tagColor: 'rose',
+        region: '🌐 Universal',
+        style: 'Clean · Spacious · Typography',
+        description:
+            'A beautifully spacious, typography-focused template. Relies on negative space and clean lines instead of heavy borders or backgrounds.',
+        highlights: ['Negative space focused', 'Modern typography', 'Side-by-side elements'],
+        accent: '#f43f5e',
+        preview: <MinimalistPreview />,
+    },
+    {
+        id: 'Creative',
+        name: 'Creative Two-Column',
+        tag: 'Tech',
+        tagColor: 'sky',
+        region: '💻 Silicon Valley',
+        style: 'Bold · Asymmetrical · Dynamic',
+        description:
+            'A striking asymmetrical layout with a bold colored sidebar. Perfect for tech roles, designers, or anyone wanting their resume to pop out of the stack.',
+        highlights: ['Bold colored sidebar', 'Asymmetrical layout', 'Card-style sections'],
+        accent: '#0ea5e9',
+        preview: <CreativePreview />,
+    },
+    {
+        id: 'Executive',
+        name: 'Executive Dark',
+        tag: 'Leadership',
+        tagColor: 'slate',
+        region: '🏛️ Corporate',
+        style: 'Authority · Centered · Impactful',
+        description:
+            'A commanding template featuring a dark, full-width header and centered traditional columns below. Communicates authority and established success.',
+        highlights: ['Dark statement header', 'Centered architecture', 'Serif typography focus'],
+        accent: '#64748b',
+        preview: <ExecutivePreview />,
+    },
 ];
 
 // ── Mini visual previews ──────────────────────────────────────────────────────
@@ -164,10 +203,116 @@ function IndiaPreview() {
     );
 }
 
+function MinimalistPreview() {
+    return (
+        <div className="w-full h-full bg-white p-4 flex flex-col text-[6px] font-sans">
+            <div className="mb-4 text-left">
+                <div className="font-light text-[14px] text-slate-800 tracking-tighter leading-none mb-1">Alexander Wright</div>
+                <div className="font-medium text-[8px] text-rose-500">Senior Software Engineer</div>
+            </div>
+            <div className="flex gap-4">
+                <div className="w-1/3 text-[5px] text-slate-400 font-bold uppercase tracking-widest text-right pr-2 border-r border-slate-200">
+                    <div className="mb-1">About</div>
+                    <div className="mt-8 mb-1">Experience</div>
+                    <div className="mt-[38px] mb-1">Education</div>
+                </div>
+                <div className="w-2/3 pl-1 flex flex-col gap-2">
+                    <div className="text-slate-500 leading-relaxed text-[5.5px]">Results-driven engineer building scalable web applications.</div>
+                    <div className="mt-2 text-[5.5px]">
+                        <div className="font-bold text-slate-800">Lead Frontend Developer</div>
+                        <div className="text-rose-500 font-medium">Innovatech Solutions</div>
+                        <div className="text-slate-500 leading-relaxed mt-0.5">Architected scalable web apps. Mentored devs.</div>
+                    </div>
+                    <div className="mt-2 text-[5.5px]">
+                        <div className="font-bold text-slate-800">B.S. Computer Science</div>
+                        <div className="text-slate-500">Univ of Technology</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function CreativePreview() {
+    return (
+        <div className="w-full h-full bg-white flex text-[6px] font-sans">
+            <div className="w-[35%] h-full bg-sky-600 text-white p-2 flex flex-col gap-2">
+                <div className="mb-2">
+                    <div className="font-bold text-[10px] leading-tight mb-1">Alexander Wright</div>
+                    <div className="opacity-80 text-[5px]">Senior Software Engineer</div>
+                </div>
+                <div className="border-b border-white/20 pb-1 mb-1 text-[4px] uppercase font-bold tracking-widest">Expertise</div>
+                <div className="flex flex-col gap-[3px] text-[4.5px]">
+                    <div>• React</div>
+                    <div>• TypeScript</div>
+                    <div>• Node.js</div>
+                </div>
+            </div>
+            <div className="w-[65%] p-3 flex flex-col gap-2.5 bg-slate-50">
+                <div>
+                    <div className="font-bold text-[6px] text-slate-800 uppercase flex items-center gap-1 mb-1.5"><span className="w-1.5 h-1.5 bg-sky-500 rounded-sm"></span> Profile</div>
+                    <div className="bg-white p-1.5 rounded shadow-sm text-slate-500 text-[5px] leading-relaxed">Results-driven engineer building scalable apps.</div>
+                </div>
+                <div>
+                    <div className="font-bold text-[6px] text-slate-800 uppercase flex items-center gap-1 mb-1.5"><span className="w-1.5 h-1.5 bg-sky-500 rounded-sm"></span> Experience</div>
+                    <div className="bg-white p-1.5 rounded shadow-sm text-[5px] border-l-[1.5px] border-sky-500 relative">
+                        <div className="font-bold text-slate-800">Lead Frontend Developer</div>
+                        <div className="text-slate-400 text-[4px] font-bold">INNOVATECH</div>
+                        <div className="text-slate-500 mt-0.5">Architected scalable web apps.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ExecutivePreview() {
+    return (
+        <div className="w-full h-full bg-white flex flex-col text-[6px] font-serif">
+            <div className="w-full bg-slate-800 text-white p-3 text-center">
+                <div className="font-bold text-[12px] tracking-wide mb-1">Alexander Wright</div>
+                <div className="text-[7px] text-slate-300">Senior Software Engineer</div>
+                <div className="text-[4px] text-slate-400 mt-1 flex justify-center gap-2"><span>email@ex.com</span><span>San Francisco</span></div>
+            </div>
+            <div className="p-3">
+                <div className="text-[5.5px] text-slate-600 italic text-center mb-1">"Results-driven engineer building web applications."</div>
+                <div className="w-6 h-px bg-slate-800 mx-auto my-1.5"></div>
+                
+                <div className="text-center font-bold text-[6px] text-slate-800 mb-1.5 font-serif">Professional Experience</div>
+                <div className="flex justify-between items-baseline border-b-2 border-slate-100 pb-0.5 mb-1">
+                    <div>
+                        <span className="font-bold text-slate-800 text-[6px]">Lead Frontend Developer</span>
+                        <div className="text-slate-500 font-bold ml-0.5 text-[5px]">Innovatech</div>
+                    </div>
+                    <span className="text-slate-400 text-[4px] font-sans">2021-Present</span>
+                </div>
+                <div className="text-[5px] text-slate-500 leading-relaxed font-sans mt-0.5 mb-2">Architected modern web apps and mentored teams.</div>
+
+                <div className="flex gap-4">
+                    <div className="w-1/2">
+                        <div className="font-bold text-[6px] text-slate-800 border-b-2 border-slate-100 pb-0.5 mb-1">Education</div>
+                        <div className="font-bold text-slate-800 text-[5px]">B.S. CS</div>
+                        <div className="text-slate-500 text-[4.5px] font-sans">Univ of Tech</div>
+                    </div>
+                    <div className="w-1/2">
+                        <div className="font-bold text-[6px] text-slate-800 border-b-2 border-slate-100 pb-0.5 mb-1">Expertise</div>
+                        <div className="flex flex-wrap gap-0.5 font-sans">
+                            {['React', 'Node'].map(s => <span key={s} className="bg-slate-100 px-1 text-[4px] font-bold text-slate-600 rounded">{s}</span>)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 const tagColors = {
     indigo: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40',
     emerald: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
     amber: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+    rose: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
+    sky: 'bg-sky-500/20 text-sky-300 border-sky-500/40',
+    slate: 'bg-slate-500/20 text-slate-300 border-slate-500/40',
 };
 
 export default function Templates() {
@@ -211,7 +356,7 @@ export default function Templates() {
             {/* Hero */}
             <div className="max-w-7xl mx-auto px-6 pt-16 pb-10 text-center relative z-10">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-xs font-semibold mb-6">
-                    <Star className="w-3.5 h-3.5" /> 3 Premium Templates Available
+                    <Star className="w-3.5 h-3.5" /> {templates.length} Premium Templates Available
                 </div>
                 <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-5 leading-tight">
                     Pick your perfect <br />
@@ -295,24 +440,6 @@ export default function Templates() {
                             </div>
                         </div>
                     ))}
-                </div>
-
-                {/* Coming soon row */}
-                <div className="mt-12">
-                    <div className="text-center mb-6">
-                        <span className="text-slate-600 text-sm font-semibold uppercase tracking-widest">More Coming Soon</span>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {['Minimalist', 'Creative Design', 'Executive Dark'].map((name) => (
-                            <div key={name} className="flex items-center justify-between bg-slate-900/30 border border-slate-800/50 rounded-2xl px-6 py-5 opacity-50">
-                                <div>
-                                    <div className="text-white font-bold">{name}</div>
-                                    <div className="text-slate-500 text-xs mt-1">Template in development</div>
-                                </div>
-                                <div className="text-xs font-bold text-slate-600 border border-slate-700 px-3 py-1.5 rounded-full">Soon</div>
-                            </div>
-                        ))}
-                    </div>
                 </div>
             </div>
         </div>

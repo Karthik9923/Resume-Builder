@@ -1,51 +1,31 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { FileText, Target, Palette } from 'lucide-react';
 import ResumeForm from '../components/ResumeForm';
 import ResumePreview from '../components/ResumePreview';
+import ATSAnalyzer from '../components/ATSAnalyzer';
+import DesignSettings from '../components/DesignSettings';
 
 const STORAGE_KEY = 'resumeBuilderData_v2';
 
 const defaultResumeData = {
   personalInfo: {
-    fullName: 'Alexander Wright',
-    jobTitle: 'Senior Software Engineer',
-    email: 'alex.wright@example.com',
-    phone: '+1 (555) 123-4567',
-    location: 'San Francisco, CA',
-    portfolio: 'github.com/alexwright'
+    fullName: '',
+    jobTitle: '',
+    email: '',
+    phone: '',
+    location: '',
+    portfolio: ''
   },
-  summary: 'Results-driven Senior Software Engineer with 6+ years of experience building scalable web applications. Passionate about clean code, developer tooling, and creating exceptional user experiences.',
-  experience: [
-    {
-      id: 1,
-      company: 'Innovatech Solutions',
-      position: 'Lead Frontend Developer',
-      startDate: 'Mar 2021',
-      endDate: 'Present',
-      description: 'Architected and built scalable modern web applications. Mentored junior developers and improved overall application performance by 40%.'
-    },
-    {
-      id: 2,
-      company: 'Creative Digital',
-      position: 'Web Developer',
-      startDate: 'Jun 2018',
-      endDate: 'Feb 2021',
-      description: 'Collaborated with designers to deliver pixel-perfect UIs. Integrated RESTful APIs and optimized state management.'
-    }
-  ],
-  education: [
-    {
-      id: 1,
-      school: 'University of Technology',
-      degree: 'B.S. in Computer Science',
-      startDate: 'Sep 2014',
-      endDate: 'May 2018',
-      description: 'Graduated with Summa Cum Laude. Minor in Interactive Design.'
-    }
-  ],
-  certifications: [
-    { id: 1, name: 'AWS Certified Developer', issuer: 'Amazon Web Services', year: '2022' }
-  ],
-  skills: ['JavaScript', 'TypeScript', 'React.js', 'Node.js', 'CSS/SASS', 'Git & GitHub', 'Figma', 'GraphQL']
+  summary: '',
+  experience: [],
+  education: [],
+  certifications: [],
+  skills: [],
+  settings: {
+    themeColor: '#6366f1',
+    fontFamily: 'font-sans'
+  }
 };
 
 export default function Builder() {
@@ -57,13 +37,17 @@ export default function Builder() {
         // Ensure new fields exist for backward compat
         if (!parsed.summary) parsed.summary = defaultResumeData.summary;
         if (!parsed.certifications) parsed.certifications = defaultResumeData.certifications;
+        if (!parsed.settings) parsed.settings = defaultResumeData.settings;
         return parsed;
       }
     } catch (e) { /* ignore */ }
     return defaultResumeData;
   });
 
-  const [template, setTemplate] = useState('US');
+  const [searchParams] = useSearchParams();
+  const templateQuery = searchParams.get('template');
+  const [template, setTemplate] = useState(templateQuery || 'US');
+  const [activeTab, setActiveTab] = useState('build'); // 'build' or 'ats'
 
   // Auto-save every time resumeData changes
   useEffect(() => {
@@ -77,17 +61,63 @@ export default function Builder() {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '500px 1fr', height: '100vh', width: '100%', overflow: 'hidden', background: '#020617' }}>
-      <ResumeForm
-        resumeData={resumeData}
-        onUpdate={handleUpdateInfo}
-        template={template}
-        setTemplate={setTemplate}
-      />
-      <ResumePreview
-        resumeData={resumeData}
-        template={template}
-      />
+    <div className="flex h-screen w-full overflow-hidden bg-slate-950">
+      {/* Sidebar Navigation */}
+      <div className="w-[70px] bg-slate-900 border-r border-slate-800 flex flex-col items-center py-6 gap-6 shrink-0 z-20">
+        <button
+          onClick={() => setActiveTab('build')}
+          className={`p-3 rounded-xl transition-all duration-200 ${activeTab === 'build' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+          title="Resume Builder"
+        >
+          <FileText size={22} />
+        </button>
+        <button
+          onClick={() => setActiveTab('ats')}
+          className={`p-3 rounded-xl transition-all duration-200 ${activeTab === 'ats' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+          title="ATS Analyzer"
+        >
+          <Target size={22} />
+        </button>
+        <button
+          onClick={() => setActiveTab('design')}
+          className={`p-3 rounded-xl transition-all duration-200 ${activeTab === 'design' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+          title="Design Settings"
+        >
+          <Palette size={22} />
+        </button>
+      </div>
+
+      {/* Control Panel (Form or ATS or Design) */}
+      <div className="w-[30%] min-w-[320px] max-w-[500px] shrink-0 h-full bg-slate-50 border-r border-slate-300 relative z-10 flex flex-col overflow-hidden">
+        {activeTab === 'build' ? (
+          <ResumeForm
+            resumeData={resumeData}
+            onUpdate={handleUpdateInfo}
+            onLoadData={setResumeData}
+            template={template}
+            setTemplate={setTemplate}
+          />
+        ) : activeTab === 'ats' ? (
+          <div className="p-6 h-full overflow-y-auto bg-slate-100">
+            <ATSAnalyzer resumeData={resumeData} />
+          </div>
+        ) : (
+          <DesignSettings
+             resumeData={resumeData}
+             onUpdate={handleUpdateInfo}
+             template={template}
+             setTemplate={setTemplate}
+          />
+        )}
+      </div>
+
+      {/* Live Preview Area */}
+      <div className="flex-1 h-full relative z-0">
+        <ResumePreview
+          resumeData={resumeData}
+          template={template}
+        />
+      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
-import React from 'react';
-import { User, Briefcase, GraduationCap, Code, LayoutTemplate, Trash2, Plus, Award, FileText } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Briefcase, GraduationCap, Code, Trash2, Plus, Award, FileText, Download as ExportIcon, Upload as ImportIcon, Sparkles } from 'lucide-react';
+import MarkdownEditor from './MarkdownEditor';
 
 function calcCompletion(resumeData) {
   const checks = [
@@ -18,7 +19,7 @@ function calcCompletion(resumeData) {
   return Math.round((filled / checks.length) * 100);
 }
 
-export default function ResumeForm({ resumeData, onUpdate, template, setTemplate }) {
+export default function ResumeForm({ resumeData, onUpdate, onLoadData, template, setTemplate }) {
   const handlePersonalInfoChange = (e) => {
     const { name, value } = e.target;
     onUpdate('personalInfo', { ...resumeData.personalInfo, [name]: value });
@@ -81,12 +82,80 @@ export default function ResumeForm({ resumeData, onUpdate, template, setTemplate
     onUpdate('certifications', resumeData.certifications.filter(c => c.id !== id));
   };
 
+  const handleSettingsChange = (field, value) => {
+    onUpdate('settings', { ...(resumeData.settings || {}), [field]: value });
+  };
+
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+
+  const generateSummary = async () => {
+    setIsGeneratingSummary(true);
+    try {
+        const payload = {
+            jobTitle: resumeData.personalInfo.jobTitle,
+            skills: resumeData.skills,
+            experience: resumeData.experience
+        };
+        const response = await fetch('http://localhost:3001/api/generate-summary', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (response.ok && data.summary) {
+            onUpdate('summary', data.summary);
+        } else {
+            alert(data.error || 'Failed to generate summary');
+        }
+    } catch (e) {
+        alert('Failed to connect to AI server. Is it running?');
+    } finally {
+        setIsGeneratingSummary(false);
+    }
+  };
+
   const inputClass = "w-full bg-slate-950 border border-slate-700 rounded-lg py-2.5 px-3 text-slate-200 font-sans text-sm outline-none transition-all placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-inner";
   const labelClass = "text-sm font-semibold text-slate-300 mb-1.5";
   const sectionClass = "mb-8 bg-slate-900/50 border border-slate-700/50 rounded-2xl p-6 shadow-lg relative overflow-hidden";
   const sectionTitleClass = "text-lg font-bold mb-5 flex items-center gap-2 text-white border-b border-slate-800 pb-3";
   const btnClass = "inline-flex items-center justify-center gap-2 bg-slate-800 border border-slate-700 text-slate-300 py-2.5 px-4 rounded-lg font-semibold cursor-pointer transition-all hover:bg-slate-700 hover:text-white text-sm shadow-md";
   const btnPrimaryClass = "inline-flex items-center justify-center gap-2 bg-indigo-500 border border-indigo-500 text-white py-2.5 px-4 rounded-xl font-bold cursor-pointer transition-all hover:bg-indigo-600 hover:shadow-[0_0_15px_rgba(99,102,241,0.4)] text-sm shadow-lg w-full mt-2";
+
+  const exportJSON = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(resumeData, null, 2));
+    const anchor = document.createElement('a');
+    anchor.setAttribute("href", dataStr);
+    anchor.setAttribute("download", `resume_${Date.now()}.json`);
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+  };
+
+  const importJSON = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target.result);
+        if (onLoadData) {
+            // Ensure array fields exist to prevent maps from crashing if the JSON is malformed
+            const safeData = {
+                ...parsed,
+                experience: parsed.experience || [],
+                education: parsed.education || [],
+                certifications: parsed.certifications || [],
+                skills: parsed.skills || []
+            };
+            onLoadData(safeData);
+        }
+      } catch (err) {
+        alert("Invalid JSON file");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = null; // reset
+  };
 
   const completion = calcCompletion(resumeData);
   const completionColor = completion < 40 ? '#ef4444' : completion < 75 ? '#f59e0b' : '#22c55e';
@@ -99,9 +168,23 @@ export default function ResumeForm({ resumeData, onUpdate, template, setTemplate
       <div className="p-8 flex flex-col gap-4">
 
         {/* Header */}
-        <div className="mb-2 px-2">
-          <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Resume Data</h1>
-          <p className="text-indigo-300 text-sm opacity-80">Refine your details in the sections below.</p>
+        <div className="mb-2 px-2 flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Resume Data</h1>
+            <p className="text-indigo-300 text-sm opacity-80">Refine your details in the sections below.</p>
+          </div>
+          <div className="flex gap-2">
+            <button
+               onClick={exportJSON}
+               className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg shadow transition" title="Export JSON"
+            >
+               <ExportIcon size={18} />
+            </button>
+            <label className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg shadow transition cursor-pointer" title="Import JSON">
+               <ImportIcon size={18} />
+               <input type="file" accept=".json" onChange={importJSON} className="hidden" />
+            </label>
+          </div>
         </div>
 
         {/* ── Completion Score ── */}
@@ -123,32 +206,7 @@ export default function ResumeForm({ resumeData, onUpdate, template, setTemplate
           </p>
         </div>
 
-        {/* ── Template ── */}
-        <div className={sectionClass}>
-          <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-          <h2 className={sectionTitleClass}><LayoutTemplate size={20} className="text-indigo-400" /> Template Format</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {[
-              { id: 'US', label: 'US', desc: 'Standard' },
-              { id: 'UK', label: 'UK', desc: 'Detailed' },
-              { id: 'India', label: 'India', desc: 'Structured' }
-            ].map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setTemplate(t.id)}
-                className={`flex flex-col items-start p-3.5 rounded-xl border transition-all text-left ${template === t.id
-                  ? 'bg-indigo-500/20 border-indigo-500 ring-1 ring-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.2)]'
-                  : 'bg-slate-950 border-slate-800 hover:border-slate-600 hover:bg-slate-800'
-                  }`}
-              >
-                <div className={`font-bold text-sm mb-0.5 ${template === t.id ? 'text-indigo-300' : 'text-slate-300'}`}>
-                  {t.label}
-                </div>
-                <div className={`text-xs ${template === t.id ? 'text-indigo-400/80' : 'text-slate-500'}`}>{t.desc}</div>
-              </button>
-            ))}
-          </div>
-        </div>
+
 
         {/* ── Personal Info ── */}
         <div className={sectionClass}>
@@ -185,14 +243,23 @@ export default function ResumeForm({ resumeData, onUpdate, template, setTemplate
         {/* ── Professional Summary ── */}
         <div className={sectionClass}>
           <div className="absolute top-0 left-0 w-1 h-full bg-violet-500"></div>
-          <h2 className={sectionTitleClass}><FileText size={20} className="text-violet-400" /> Professional Summary</h2>
+          <div className="flex justify-between items-center mb-5 border-b border-slate-800 pb-3">
+              <h2 className="text-lg font-bold flex items-center gap-2 text-white"><FileText size={20} className="text-violet-400" /> Professional Summary</h2>
+              <button 
+                  onClick={generateSummary}
+                  disabled={isGeneratingSummary}
+                  className="px-3 py-1.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white text-xs font-bold rounded-lg shadow-lg hover:shadow-violet-500/50 transition whitespace-nowrap disabled:opacity-50 flex items-center gap-1.5"
+              >
+                  <Sparkles size={14} /> {isGeneratingSummary ? 'Generating...' : 'Auto-Generate'}
+              </button>
+          </div>
           <div className="flex flex-col gap-2">
             <label className={labelClass}>A brief overview of your professional background</label>
-            <textarea
-              className={`${inputClass} min-h-[110px] resize-y leading-relaxed`}
+            <MarkdownEditor
               value={resumeData.summary || ''}
-              onChange={handleSummaryChange}
+              onChange={(val) => onUpdate('summary', val)}
               placeholder="e.g. Experienced software engineer with 5+ years building scalable web apps..."
+              minHeight="110px"
             />
           </div>
         </div>
@@ -223,7 +290,7 @@ export default function ResumeForm({ resumeData, onUpdate, template, setTemplate
               </div>
               <div className="flex flex-col gap-2 mb-4">
                 <label className={labelClass}>Description</label>
-                <textarea className={`${inputClass} min-h-[100px] resize-y leading-relaxed`} value={exp.description} onChange={e => handleExpChange(exp.id, 'description', e.target.value)}></textarea>
+                <MarkdownEditor value={exp.description} onChange={val => handleExpChange(exp.id, 'description', val)} minHeight="100px" />
               </div>
               <button className={`${btnClass} text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 hover:border-rose-500/30 w-full sm:w-auto mt-2`} onClick={() => removeExperience(exp.id)}>
                 <Trash2 size={16} /> Remove Role
@@ -259,7 +326,7 @@ export default function ResumeForm({ resumeData, onUpdate, template, setTemplate
               </div>
               <div className="flex flex-col gap-2 mb-4">
                 <label className={labelClass}>Description</label>
-                <textarea className={`${inputClass} min-h-[100px] resize-y leading-relaxed`} value={edu.description} onChange={e => handleEduChange(edu.id, 'description', e.target.value)}></textarea>
+                <MarkdownEditor value={edu.description} onChange={val => handleEduChange(edu.id, 'description', val)} minHeight="100px" />
               </div>
               <button className={`${btnClass} text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 hover:border-rose-500/30 w-full sm:w-auto mt-2`} onClick={() => removeEducation(edu.id)}>
                 <Trash2 size={16} /> Remove Education
